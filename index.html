@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For A.L.W.</title>
+    <style>
+        body { 
+            background-color: #050A1F; 
+            color: #FDFBF7; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            font-family: 'Georgia', serif; 
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 24px; 
+        }
+        .tile { 
+            width: 90px; 
+            height: 90px; 
+            border-radius: 12px; 
+            background: linear-gradient(145deg, #0A1931, #152A4A); 
+            border: 1px solid rgba(212, 175, 55, 0.4); 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); 
+        }
+        .tile:hover {
+            border-color: rgba(212, 175, 55, 0.8);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+        .tile:active { 
+            transform: scale(0.92); 
+            background: #D4AF37; 
+            border: 1px solid #FDFBF7; 
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.8); 
+        }
+    </style>
+</head>
+<body>
+    <div class="grid">
+        <!-- Audio stems updated to match the new track themes -->
+        <div class="tile" data-stem="stems/birthday-intro.mp3" data-wave="656.3"></div> 
+        <div class="tile" data-stem="stems/worth-the-wait.mp3" data-wave="486.1"></div>
+        <div class="tile" data-stem="stems/beautiful-lift.mp3" data-wave="434.0"></div>
+    </div>
+
+    <script>
+        let audioCtx;
+
+        async function playHybridAudio(stemPath, wavelength) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            const speedOfLight = 299792458;
+            const octaveShift = 40; 
+            const freq = (speedOfLight / (wavelength * 1e-9)) / Math.pow(2, octaveShift);
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine'; 
+            osc.frequency.value = freq;
+            
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.0);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 3.0);
+
+            try {
+                const response = await fetch(stemPath);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(audioCtx.destination);
+                source.start();
+            } catch (err) {
+                console.error("Stem not found yet, playing chime only.");
+            }
+        }
+
+        document.querySelectorAll('.tile').forEach(tile => {
+            tile.addEventListener('click', (e) => {
+                const stem = e.target.getAttribute('data-stem');
+                const wave = parseFloat(e.target.getAttribute('data-wave'));
+                playHybridAudio(stem, wave);
+            });
+        });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For A.L.W.</title>
+    <style>
+        body { 
+            background-color: #050A1F; 
+            color: #FDFBF7; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            font-family: 'Georgia', serif; 
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 24px; 
+        }
+        .tile { 
+            width: 90px; 
+            height: 90px; 
+            border-radius: 12px; 
+            background: linear-gradient(145deg, #0A1931, #152A4A); 
+            border: 1px solid rgba(212, 175, 55, 0.4); 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); 
+        }
+        .tile:hover {
+            border-color: rgba(212, 175, 55, 0.8);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+        .tile:active { 
+            transform: scale(0.92); 
+            background: #D4AF37; 
+            border: 1px solid #FDFBF7; 
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.8); 
+        }
+        .tile.played {
+            border-color: rgba(212, 175, 55, 0.9);
+        }
+        #hidden-message {
+            margin-top: 40px;
+            font-size: 1.4em;
+            letter-spacing: 2px;
+            color: #D4AF37;
+            opacity: 0;
+            transition: opacity 1.8s ease;
+            text-align: center;
+        }
+        #hidden-message.reveal {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid">
+        <div class="tile" data-stem="stems/telegram-bliss.mp3" data-wave="656.3"></div> 
+        <div class="tile" data-stem="stems/lazarus-walk.mp3" data-wave="486.1"></div>
+        <div class="tile" data-stem="stems/wont-fold-chorus.mp3" data-wave="434.0"></div>
+    </div>
+
+    <div id="hidden-message">Happy Birthday</div>
+
+    <script>
+        let audioCtx;
+        const playedStems = new Set();
+
+        async function playHybridAudio(stemPath, wavelength) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            const speedOfLight = 299792458;
+            const octaveShift = 40; 
+            const freq = (speedOfLight / (wavelength * 1e-9)) / Math.pow(2, octaveShift);
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine'; 
+            osc.frequency.value = freq;
+            
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.0);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 3.0);
+
+            try {
+                const response = await fetch(stemPath);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(audioCtx.destination);
+                source.start();
+            } catch (err) {
+                console.error("Stem not found yet, playing chime only.");
+            }
+        }
+
+        function checkAllPlayed() {
+            if (playedStems.size === document.querySelectorAll('.tile').length) {
+                document.getElementById('hidden-message').classList.add('reveal');
+            }
+        }
+
+        document.querySelectorAll('.tile').forEach(tile => {
+            tile.addEventListener('click', (e) => {
+                const stem = e.target.getAttribute('data-stem');
+                const wave = parseFloat(e.target.getAttribute('data-wave'));
+                playHybridAudio(stem, wave);
+                e.target.classList.add('played');
+                playedStems.add(stem);
+                checkAllPlayed();
+            });
+        });
+    </script>
+</body>
+</html>
+
+    </script>
+</body>
+</html>
