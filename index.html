@@ -5,226 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>For A.L.W.</title>
     <style>
-        body { 
-            background-color: #050A1F; 
-            color: #FDFBF7; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            font-family: 'Georgia', serif; 
-        }
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 24px; 
-        }
-        .tile { 
-            width: 90px; 
-            height: 90px; 
-            border-radius: 12px; 
-            background: linear-gradient(145deg, #0A1931, #152A4A); 
-            border: 1px solid rgba(212, 175, 55, 0.4); 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); 
-        }
-        .tile:hover {
-            border-color: rgba(212, 175, 55, 0.8);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
-        }
-        .tile:active { 
-            transform: scale(0.92); 
-            background: #D4AF37; 
-            border: 1px solid #FDFBF7; 
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.8); 
-        }
-    </style>
-</head>
-<body>
-    <div class="grid">
-        <!-- Audio stems updated to match the new track themes -->
-        <div class="tile" data-stem="stems/birthday-intro.mp3" data-wave="656.3"></div> 
-        <div class="tile" data-stem="stems/worth-the-wait.mp3" data-wave="486.1"></div>
-        <div class="tile" data-stem="stems/beautiful-lift.mp3" data-wave="434.0"></div>
-    </div>
-
-    <script>
-        let audioCtx;
-
-        async function playHybridAudio(stemPath, wavelength) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
-            const speedOfLight = 299792458;
-            const octaveShift = 40; 
-            const freq = (speedOfLight / (wavelength * 1e-9)) / Math.pow(2, octaveShift);
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.type = 'sine'; 
-            osc.frequency.value = freq;
-            
-            gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 0.05);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.0);
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 3.0);
-
-            try {
-                const response = await fetch(stemPath);
-                const arrayBuffer = await response.arrayBuffer();
-                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-                
-                const source = audioCtx.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(audioCtx.destination);
-                source.start();
-            } catch (err) {
-                console.error("Stem not found yet, playing chime only.");
-            }
+        body {
+            background-color: #050A1F; /* Deep blue background */
+            color: #FDFBF7; /* Cream text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Georgia', serif;
+            overflow: hidden;
         }
 
-        document.querySelectorAll('.tile').forEach(tile => {
-            tile.addEventListener('click', (e) => {
-                const stem = e.target.getAttribute('data-stem');
-                const wave = parseFloat(e.target.getAttribute('data-wave'));
-                playHybridAudio(stem, wave);
-            });
-        });
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For A.L.W.</title>
-    <style>
-        body { 
-            background-color: #050A1F; 
-            color: #FDFBF7; 
-            display: flex; 
+        /* The Opening Message Screen */
+        #splash-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #050A1F;
+            display: flex;
             flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            font-family: 'Georgia', serif; 
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: opacity 0.8s ease;
         }
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 24px; 
-        }
-        .tile { 
-            width: 90px; 
-            height: 90px; 
-            border-radius: 12px; 
-            background: linear-gradient(145deg, #0A1931, #152A4A); 
-            border: 1px solid rgba(212, 175, 55, 0.4); 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); 
-        }
-        .tile:hover {
-            border-color: rgba(212, 175, 55, 0.8);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
-        }
-        .tile:active { 
-            transform: scale(0.92); 
-            background: #D4AF37; 
-            border: 1px solid #FDFBF7; 
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.8); 
-        }
-        .tile.played {
-            border-color: rgba(212, 175, 55, 0.9);
-        }
-        #hidden-message {
-            margin-top: 40px;
-            font-size: 1.4em;
+
+        #splash-screen h2 {
+            font-weight: normal;
             letter-spacing: 2px;
-            color: #D4AF37;
-            opacity: 0;
-            transition: opacity 1.8s ease;
+            margin-bottom: 20px;
+        }
+
+        #splash-screen img {
+            max-width: 250px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); /* Subtle gold glow */
+        }
+
+        .enter-button {
+            padding: 12px 30px;
+            background-color: #D4AF37; /* Gold button */
+            color: #050A1F;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .enter-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
+        }
+
+        /* The Media Player (Hidden initially) */
+        #media-container {
+            display: none; 
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 12px;
+            background: linear-gradient(145deg, #0A1931, #152A4A);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             text-align: center;
         }
-        #hidden-message.reveal {
-            opacity: 1;
+
+        audio, video {
+            width: 100%;
+            outline: none;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
-    <div class="grid">
-        <div class="tile" data-stem="stems/telegram-bliss.mp3" data-wave="656.3"></div> 
-        <div class="tile" data-stem="stems/lazarus-walk.mp3" data-wave="486.1"></div>
-        <div class="tile" data-stem="stems/wont-fold-chorus.mp3" data-wave="434.0"></div>
+
+    <!-- Opening Screen -->
+    <div id="splash-screen">
+        <h2>Happy Birthday, Beautiful.</h2>
+        <img src="6a9dfc26dc014b99f6feb1e3-1788739079236-1.gif" alt="A gift for you">
+        <button class="enter-button" onclick="revealGift()">Open Your Gift</button>
     </div>
 
-    <div id="hidden-message">Happy Birthday</div>
+    <!-- Media Player -->
+    <div id="media-container">
+        <!-- If you render an actual mp4 video later, change <audio> to <video> -->
+        <audio id="player" controls>
+            <source src="EWProductions - Happy_Birthday_Beautiful - 1788725011365.m4a" type="audio/mp4">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
 
     <script>
-        let audioCtx;
-        const playedStems = new Set();
+        function revealGift() {
+            const splash = document.getElementById('splash-screen');
+            const container = document.getElementById('media-container');
+            const player = document.getElementById('player');
 
-        async function playHybridAudio(stemPath, wavelength) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            // 1. Fade out the splash screen
+            splash.style.opacity = '0';
             
-            const speedOfLight = 299792458;
-            const octaveShift = 40; 
-            const freq = (speedOfLight / (wavelength * 1e-9)) / Math.pow(2, octaveShift);
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.type = 'sine'; 
-            osc.frequency.value = freq;
-            
-            gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 0.05);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.0);
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 3.0);
-
-            try {
-                const response = await fetch(stemPath);
-                const arrayBuffer = await response.arrayBuffer();
-                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            // 2. Wait for the fade to finish (0.8 seconds), then swap what is visible
+            setTimeout(() => {
+                splash.style.display = 'none';
+                container.style.display = 'block';
                 
-                const source = audioCtx.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(audioCtx.destination);
-                source.start();
-            } catch (err) {
-                console.error("Stem not found yet, playing chime only.");
-            }
+                // 3. Automatically start playing the track
+                player.play(); 
+            }, 800);
         }
-
-        function checkAllPlayed() {
-            if (playedStems.size === document.querySelectorAll('.tile').length) {
-                document.getElementById('hidden-message').classList.add('reveal');
-            }
-        }
-
-        document.querySelectorAll('.tile').forEach(tile => {
-            tile.addEventListener('click', (e) => {
-                const stem = e.target.getAttribute('data-stem');
-                const wave = parseFloat(e.target.getAttribute('data-wave'));
-                playHybridAudio(stem, wave);
-                e.target.classList.add('played');
-                playedStems.add(stem);
-                checkAllPlayed();
-            });
-        });
-    </script>
-</body>
-</html>
-
     </script>
 </body>
 </html>
