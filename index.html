@@ -5,59 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>For A.L.W.</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            /* The Emerald Green & Gold Background Image */
             background-image: url('background.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
-            background-color: #050A1F; /* Fallback color */
-            
-            color: #FDFBF7; /* Cream text */
+            background-color: #050A1F;
+            color: #FDFBF7;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
             font-family: 'Georgia', serif;
             overflow: hidden;
         }
 
-        /* The Opening Message Screen */
+        /* Splash Screen */
         #splash-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* Semi-transparent overlay so the background image shows through */
-            background-color: rgba(5, 10, 31, 0.75); 
+            position: fixed;
+            inset: 0;
+            background-color: rgba(5, 10, 31, 0.75);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10;
             transition: opacity 0.8s ease;
+            text-align: center;
+            padding: 20px;
         }
 
         #splash-screen h2 {
             font-weight: normal;
             letter-spacing: 2px;
             margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8); /* Helps text pop against the background */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
 
         #splash-screen img {
             max-width: 250px;
+            width: 100%;
             border-radius: 8px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); 
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
         }
 
         .enter-button {
             padding: 12px 30px;
-            background-color: #D4AF37; /* Gold button */
+            background-color: #D4AF37;
             color: #050A1F;
             border: none;
             border-radius: 30px;
@@ -72,41 +74,41 @@
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
         }
 
-        /* The Media Player (Hidden initially) */
+        /* Video Container */
         #media-container {
-            display: none; 
-            width: 90%;
-            max-width: 600px;
-            padding: 20px;
-            border: 1px solid rgba(212, 175, 55, 0.4);
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            padding: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.5);
             border-radius: 12px;
-            /* A slightly transparent deep blue box for the media player */
-            background: linear-gradient(145deg, rgba(10, 25, 49, 0.9), rgba(21, 42, 74, 0.9));
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            text-align: center;
+            background: linear-gradient(145deg, rgba(10, 25, 49, 0.95), rgba(21, 42, 74, 0.95));
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
             z-index: 5;
         }
 
-        audio {
+        video {
             width: 100%;
-            outline: none;
+            max-height: 75vh;
+            display: block;
             border-radius: 8px;
+            background-color: #000;
+            outline: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- Opening Screen -->
     <div id="splash-screen">
         <h2>Happy Birthday, Beautiful.</h2>
         <img src="6a9dfc26dc014b99f6feb1e3-1788739079236-1.gif" alt="A gift for you">
         <button class="enter-button" onclick="revealGift()">Open Your Gift</button>
     </div>
 
-    <!-- Media Player -->
     <div id="media-container">
-        <video id="player" controls>
-            <source src="lyric-video.mp4" type="audio/mp4">
+        <video id="player" controls playsinline preload="auto">
+            <source src="lyric-video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
         </video>
     </div>
 
@@ -116,16 +118,14 @@
             const container = document.getElementById('media-container');
             const player = document.getElementById('player');
 
-            // Fade out the splash screen
             splash.style.opacity = '0';
-            
-            // Wait for the fade to finish, then swap visibility
+
             setTimeout(() => {
                 splash.style.display = 'none';
                 container.style.display = 'block';
-                
-                // Automatically start playing the track
-                player.play(); 
+                player.play().catch(err => {
+                    console.log("Autoplay prevented; user can press play manually.", err);
+                });
             }, 800);
         }
     </script>
