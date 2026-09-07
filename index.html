@@ -6,7 +6,14 @@
     <title>For A.L.W.</title>
     <style>
         body {
-            background-color: #050A1F; /* Deep blue background */
+            /* The Emerald Green & Gold Background Image */
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-color: #050A1F; /* Fallback color */
+            
             color: #FDFBF7; /* Cream text */
             display: flex;
             justify-content: center;
@@ -24,7 +31,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #050A1F;
+            /* Semi-transparent overlay so the background image shows through */
+            background-color: rgba(5, 10, 31, 0.75); 
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -37,13 +45,14 @@
             font-weight: normal;
             letter-spacing: 2px;
             margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8); /* Helps text pop against the background */
         }
 
-        #splash-screen  {
+        #splash-screen img {
             max-width: 250px;
             border-radius: 8px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); /* Subtle gold glow */
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); 
         }
 
         .enter-button {
@@ -55,6 +64,7 @@
             font-size: 1.1em;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
         .enter-button:active {
@@ -70,12 +80,14 @@
             padding: 20px;
             border: 1px solid rgba(212, 175, 55, 0.4);
             border-radius: 12px;
-            background: background-image src="https://www.dreamstime.com/emerald-green-gift-box-gold-ribbon-candle-generative-ai-harmonious-blend-form-color-concept-visual-expression-image374228889"; linear-gradient(145deg, #0A1931, #152A4A);
+            /* A slightly transparent deep blue box for the media player */
+            background: linear-gradient(145deg, rgba(10, 25, 49, 0.9), rgba(21, 42, 74, 0.9));
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             text-align: center;
+            z-index: 5;
         }
 
-        audio, video {
+        audio {
             width: 100%;
             outline: none;
             border-radius: 8px;
@@ -93,9 +105,10 @@
 
     <!-- Media Player -->
     <div id="media-container">
-        <video id="player" controls>
-            <source src="lyric-video.mp4" type="audio/mp4">
-            </video>
+        <audio id="player" controls>
+            <source src="EWProductions - Happy_Birthday_Beautiful - 1788725011365.m4a" type="audio/mp4">
+            Your browser does not support the audio element.
+        </audio>
     </div>
 
     <script>
@@ -104,15 +117,15 @@
             const container = document.getElementById('media-container');
             const player = document.getElementById('player');
 
-            // 1. Fade out the splash screen
+            // Fade out the splash screen
             splash.style.opacity = '0';
             
-            // 2. Wait for the fade to finish (0.8 seconds), then swap what is visible
+            // Wait for the fade to finish, then swap visibility
             setTimeout(() => {
-                splash.style.display = '719405797_1788728978046837.jpg';
+                splash.style.display = 'none';
                 container.style.display = 'block';
                 
-                // 3. Automatically start playing the track
+                // Automatically start playing the track
                 player.play(); 
             }, 800);
         }
